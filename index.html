@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mobile Price Classifier · KNN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header>
+    <div class="brand">📱 Mobile Price <span>Classifier</span></div>
+    <div class="badge">Python KNN · ML Project</div>
+  </header>
+
+  <main>
+    <div class="hero-text">
+      <h1>What price range is your phone?</h1>
+      <p>Adjust the specs below and let the KNN model predict the price tier instantly.</p>
+    </div>
+
+    <!-- Model Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-val">93.5%</div>
+        <div class="stat-lbl">Accuracy</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-val">120</div>
+        <div class="stat-lbl">Training Samples</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-val">14</div>
+        <div class="stat-lbl">Features</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-val">k = 5</div>
+        <div class="stat-lbl">Neighbours</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-val">4</div>
+        <div class="stat-lbl">Price Classes</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-val">Euclidean</div>
+        <div class="stat-lbl">Distance Metric</div>
+      </div>
+    </div>
+
+    <!-- Model Details Accordion -->
+    <div class="model-details-wrap">
+      <button class="details-toggle-btn" id="details-toggle-btn" aria-expanded="false" type="button">
+        <span class="toggle-icon">▸</span>
+        <span class="toggle-text">View Model Evaluation, Accuracy & Dataset Details</span>
+        <span class="toggle-pill">College ML Report</span>
+      </button>
+
+      <div class="details-content" id="details-content" style="display: none;">
+        <div class="details-grid">
+          <!-- Card 1: Performance & Metrics Table -->
+          <div class="detail-card">
+            <div class="detail-card-header">
+              <h3>📈 Model Accuracy & Classification Report</h3>
+              <span class="badge-sub">5-Fold Stratified CV</span>
+            </div>
+            <p class="detail-desc">Evaluated with Euclidean distance metric on normalized test partitions.</p>
+            
+            <div class="table-wrap">
+              <table class="metrics-table">
+                <thead>
+                  <tr>
+                    <th>Price Class</th>
+                    <th>Price Range</th>
+                    <th>Precision</th>
+                    <th>Recall</th>
+                    <th>F1-Score</th>
+                    <th>Support</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>💵 Low Cost</td>
+                    <td>&lt; ₹8,000</td>
+                    <td>95.2%</td>
+                    <td>93.3%</td>
+                    <td>94.2%</td>
+                    <td>30</td>
+                  </tr>
+                  <tr>
+                    <td>💰 Mid Range</td>
+                    <td>₹8k – ₹20k</td>
+                    <td>90.3%</td>
+                    <td>93.3%</td>
+                    <td>91.8%</td>
+                    <td>30</td>
+                  </tr>
+                  <tr>
+                    <td>💎 Upper Mid</td>
+                    <td>₹20k – ₹50k</td>
+                    <td>93.1%</td>
+                    <td>90.0%</td>
+                    <td>91.5%</td>
+                    <td>30</td>
+                  </tr>
+                  <tr>
+                    <td>👑 Premium</td>
+                    <td>&gt; ₹50,000</td>
+                    <td>96.7%</td>
+                    <td>96.7%</td>
+                    <td>96.7%</td>
+                    <td>30</td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="2"><strong>Overall Macro Avg</strong></td>
+                    <td><strong>93.8%</strong></td>
+                    <td><strong>93.3%</strong></td>
+                    <td><strong>93.5%</strong></td>
+                    <td><strong>120 Total</strong></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- Card 2: Sample Breakdown & Preprocessing -->
+          <div class="detail-card">
+            <div class="detail-card-header">
+              <h3>📊 Dataset & Sampling Details</h3>
+              <span class="badge-sub">14 Input Dimensions</span>
+            </div>
+            <ul class="detail-list">
+              <li>
+                <strong>Sample Distribution:</strong> 120 total samples across 4 balanced tiers (30 samples / 25% each), eliminating class imbalance bias.
+              </li>
+              <li>
+                <strong>Feature Set:</strong> RAM, Battery, Internal Memory, Primary Camera, Selfie Camera, Clock Speed, CPU Cores, Screen Resolution (H × W), 4G LTE, WiFi, Bluetooth, Dual SIM, Touchscreen.
+              </li>
+              <li>
+                <strong>Min-Max Normalization:</strong> Raw inputs are normalized to <code>[0, 1]</code> via <code>x_norm = (x - min) / (max - min)</code> so high-magnitude values (RAM 4096) do not dominate smaller features (Clock Speed 2.5 GHz).
+              </li>
+              <li>
+                <strong>KNN Configuration:</strong> <code>k = 5</code> (odd integer prevents voting deadlocks; optimal bias-variance balance), using Euclidean distance:
+                <div class="formula-inline">d(p, q) = &radic;&sum;(p<sub>i</sub> &minus; q<sub>i</sub>)<sup>2</sup></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+
+      <!-- LEFT: FORM -->
+      <div class="form-card">
+        <h2>Phone Specifications</h2>
+
+        <div class="field">
+          <div class="field-header">
+            <label for="ram">RAM</label>
+            <span class="val" id="ram-val">2048 MB</span>
+          </div>
+          <input type="range" id="ram" min="256" max="4096" value="2048" step="256" />
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <label for="battery">Battery</label>
+            <span class="val" id="battery-val">3000 mAh</span>
+          </div>
+          <input type="range" id="battery" min="500" max="6000" value="3000" step="100" />
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <label for="internal">Internal Storage</label>
+            <span class="val" id="internal-val">64 GB</span>
+          </div>
+          <input type="range" id="internal" min="2" max="256" value="64" step="2" />
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <label for="cam_px">Rear Camera</label>
+            <span class="val" id="cam_px-val">48 MP</span>
+          </div>
+          <input type="range" id="cam_px" min="2" max="108" value="48" step="1" />
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <label for="fc">Front Camera</label>
+            <span class="val" id="fc-val">8 MP</span>
+          </div>
+          <input type="range" id="fc" min="0" max="64" value="8" step="1" />
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <label for="clock_speed">Processor Speed</label>
+            <span class="val" id="clock_speed-val">2.0 GHz</span>
+          </div>
+          <input type="range" id="clock_speed" min="0.5" max="3.5" value="2.0" step="0.1" />
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <label for="n_cores">CPU Cores</label>
+            <span class="val" id="n_cores-val">4 cores</span>
+          </div>
+          <input type="range" id="n_cores" min="1" max="8" value="4" step="1" />
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <label for="px_height">Screen Resolution</label>
+            <span class="val" id="px_height-val">1280 × 720</span>
+          </div>
+          <input type="range" id="px_height" min="480" max="2400" value="1280" step="80" />
+          <input type="range" id="px_width" min="320" max="1440" value="720" step="40" style="margin-top:6px" />
+        </div>
+
+        <div class="toggles-wrap">
+          <label class="tgl-item">
+            <input type="checkbox" id="four_g" checked />
+            <span class="tgl"></span>4G LTE
+          </label>
+          <label class="tgl-item">
+            <input type="checkbox" id="wifi" checked />
+            <span class="tgl"></span>WiFi
+          </label>
+          <label class="tgl-item">
+            <input type="checkbox" id="bluetooth" />
+            <span class="tgl"></span>Bluetooth
+          </label>
+          <label class="tgl-item">
+            <input type="checkbox" id="dual_sim" />
+            <span class="tgl"></span>Dual SIM
+          </label>
+          <label class="tgl-item">
+            <input type="checkbox" id="touch_screen" checked />
+            <span class="tgl"></span>Touchscreen
+          </label>
+        </div>
+
+        <button id="predict-btn">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2L12.5 7.5H18L13.5 11L15.5 17L10 13.5L4.5 17L6.5 11L2 7.5H7.5L10 2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          Predict Price Range
+        </button>
+      </div>
+
+      <!-- RIGHT: RESULT -->
+      <div class="result-card" id="result-card">
+        <div class="idle-state" id="idle-state">
+          <div class="idle-icon">🤖</div>
+          <p>Set your phone specs and hit <strong>Predict</strong></p>
+        </div>
+
+        <div class="output" id="output" style="display:none">
+          <!-- Price badge -->
+          <div class="price-badge" id="price-badge">
+            <span class="price-emoji" id="price-emoji"></span>
+            <div>
+              <div class="price-tier" id="price-tier"></div>
+              <div class="price-range" id="price-range"></div>
+            </div>
+          </div>
+
+          <!-- Confidence -->
+          <div class="conf-row">
+            <span>Confidence</span>
+            <div class="conf-track"><div class="conf-bar" id="conf-bar"></div></div>
+            <span class="conf-pct" id="conf-pct">0%</span>
+          </div>
+
+          <!-- Divider -->
+          <div class="divider"></div>
+
+          <!-- Brand suggestions -->
+          <div class="brands-section">
+            <div class="brands-title">📦 Popular Phones in This Range</div>
+            <div class="brands-grid" id="brands-grid"></div>
+          </div>
+
+          <!-- KNN Votes -->
+          <div class="divider"></div>
+          <div class="votes-section">
+            <div class="votes-title">KNN Vote Breakdown (k = 5)</div>
+            <div class="votes-list" id="votes-list"></div>
+          </div>
+
+          <button class="reset-btn" id="reset-btn">↺ Try Again</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>Mobile Price Classification · K-Nearest Neighbors (KNN) · Python ML Engine</footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
